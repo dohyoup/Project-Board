@@ -2,6 +2,9 @@ package com.fastcampus.projectboard.repository;
 
 import com.fastcampus.projectboard.config.JpaConfig;
 import com.fastcampus.projectboard.domain.Article;
+import com.fastcampus.projectboard.domain.UserAccount;
+import org.apache.catalina.User;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,63 +20,48 @@ import static org.assertj.core.api.Assertions.*;
 class JpaRepositoryTest {
 
     private final ArticleRepository articleRepository;
-
     private final ArticleCommentRepository articleCommentRepository;
+    private final UserAccountRepository userAccountRepository;
 
 
     public JpaRepositoryTest(
             @Autowired ArticleRepository articleRepository,
-            @Autowired ArticleCommentRepository articleCommentRepository
+            @Autowired ArticleCommentRepository articleCommentRepository,
+            @Autowired UserAccountRepository userAccountRepository
     ) {
         this.articleRepository = articleRepository;
         this.articleCommentRepository = articleCommentRepository;
+        this.userAccountRepository = userAccountRepository;
     }
-
     @DisplayName("select 테스트")
     @Test
-    void given_whenSelecting_thenWorksFine() {
-       // Given
-
-       // when
-       List<Article> articles = articleRepository.findAll();
-       // then
-       assertThat(articles)
-               .isNotNull()
-               .hasSize(0);
-    }
-
-    @DisplayName("insert 테스트")
-    @Test
-    void given_whenInserting_thenWorksFine() {
+    void givenTestData_whenSelecting_thenWorksFine() {
        // Given
        long previousCount = articleRepository.count();
-
+       UserAccount userAccount = userAccountRepository.save(UserAccount.of("youp","pw",null,null,null));
+       Article article = Article.of(userAccount, "new article","new content","#spring");
        // when
-       Article savedArticles = articleRepository.save(Article.of("new article", "new content", "#spring"));
+       articleRepository.save(article);
        // then
-       assertThat(articleRepository.count())
-               .isEqualTo(previousCount + 1);
+       assertThat(articleRepository.count()).isEqualTo(previousCount + 1);
     }
 
     @DisplayName("update 테스트")
     @Test
-    void given_whenUpdating_thenWorksFine() {
+    void givenTestData_whenUpdating_thenWorksFine() {
        // Given
-       articleRepository.save(Article.of("new article", "new content", "#spring"));
        Article article = articleRepository.findById(1L).orElseThrow();
        String updatedHashTag = "#springboot";
        article.setHashtag(updatedHashTag);
        // when
-       Article newArticles = articleRepository.saveAndFlush(article);
+       Article savedArticles = articleRepository.saveAndFlush(article);
        // then
-       assertThat(newArticles).hasFieldOrPropertyWithValue("hashtag", updatedHashTag);
+       assertThat(savedArticles).hasFieldOrPropertyWithValue("hashtag", updatedHashTag);
     }
-
     @DisplayName("delete 테스트")
     @Test
-    void given_whenDeleting_thenWorksFine() {
+    void givenTestData_whenDeleting_thenWorksFine() {
        // Given
-       articleRepository.save(Article.of("new article", "new content", "#spring"));// 데이터 추가
        Article article = articleRepository.findById(1L).orElseThrow(); // 추가한 데이터 가져오기
        long previousArticleCount = articleRepository.count();
        long previousArticleCommentCount = articleCommentRepository.count();
