@@ -24,7 +24,8 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @GetMapping
-    public String articles(
+    public String articles(//required = false 는 필수 파라미터가 아니라는 의미
+                           //Pageable size 는 기본 설정값이 10이지만 명시해줬음
             @RequestParam(name ="searchType", required = false) SearchType searchType,
             @RequestParam(name ="searchValue", required = false) String searchValue,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
