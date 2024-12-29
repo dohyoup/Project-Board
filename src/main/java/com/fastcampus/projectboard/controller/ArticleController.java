@@ -35,19 +35,20 @@ public class ArticleController {
             @RequestParam(name ="searchValue", required = false) String searchValue,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             ModelMap map
-                           ) {
+    ) {
         Page<ArticleResponse> articles = articleService.searchArticles(searchType, searchValue, pageable).map(ArticleResponse::from);
         List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
 
         map.addAttribute("articles", articles);
         map.addAttribute("paginationBarNumbers", barNumbers );
+        map.addAttribute("searchTypes", SearchType.values() );
 
         return "articles/index";
     }
 
     @GetMapping("/{articleId}")
     public String article(@PathVariable(name="articleId") Long articleId, ModelMap map) {
-        ArticleWithCommentResponse article = ArticleWithCommentResponse.from(articleService.getArticle(articleId));
+        ArticleWithCommentResponse article = ArticleWithCommentResponse.from(articleService.getArticleWithComments(articleId));
         map.addAttribute("article", article);
         map.addAttribute("articleComments", article.articleCommentResponses());
         return "articles/detail";
