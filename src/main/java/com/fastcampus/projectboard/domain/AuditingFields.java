@@ -33,6 +33,6 @@ public class AuditingFields {
     private LocalDateTime modifiedAt; // 수정일지
 
     @LastModifiedBy
-    @Column(nullable = false, updatable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String modifiedBy; // 수정자
 }
